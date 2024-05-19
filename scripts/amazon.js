@@ -1,4 +1,5 @@
 import {cart} from './cart.js';
+import {products} from '../data/products.js';
 let productHTML = '';
 
 //looping products array to get each object and its props in HTML content
@@ -27,7 +28,7 @@ products.forEach((product) => {
         </div>
 
         <div class="product-quantity-container">
-        <select>
+        <select class="js-product-quantity-selector-${product.id}">
             <option selected value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -43,7 +44,7 @@ products.forEach((product) => {
 
         <div class="product-spacer"></div>
 
-        <div class="added-to-cart">
+        <div class="added-to-cart js-added-to-cart-${product.id}">
         <img src="images/icons/checkmark.png">
         Added
         </div>
@@ -66,7 +67,8 @@ const addToCartElem = document.querySelectorAll('.js-add-to-cart');
 addToCartElem.forEach((addToCartButton) => {
     addToCartButton.addEventListener('click', function () {
         // Fetching unique ID from dataset given in data Attribute of Button
-        const productId = addToCartButton.dataset.productId;
+        const {productId} = addToCartButton.dataset;
+        const quantitySelected = Number(document.querySelector(`.js-product-quantity-selector-${productId}`).value);
         // console.log(productName);
         let matchingFound;
         // check whether item is already present in the cart array
@@ -77,25 +79,30 @@ addToCartElem.forEach((addToCartButton) => {
         })
  
         if (matchingFound) {
-            matchingFound.quantity++;
+            matchingFound.quantity = matchingFound.quantity + quantitySelected;
             console.log(cart);
         } else {
-            console.log('Pushing Item here');
+            // console.log('Pushing Item here');
             cart.push({
                 productId: productId,
-                quantity: 1
+                quantity: quantitySelected,
             });
-            console.log(cart);
+            // console.log(cart);
         }
 
 // Calculating Total items in cart 
         let cartQuantity = 0;
         cart.forEach((item) => {
+            console.log(cartQuantity,quantitySelected);
             cartQuantity = cartQuantity + item.quantity;
             console.log(cartQuantity, 'Items in cart');
         })
 // setting total cart Items to the cart Interface
         document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
+        document.querySelector(`.js-added-to-cart-${productId}`).classList.add('showElem');
+        setTimeout(()=>{
+            document.querySelector(`.js-added-to-cart-${productId}`).classList.remove('showElem');
+        },2000);
     })
 })
 
