@@ -1,5 +1,4 @@
-
-
+import {cart} from './cart.js';
 let productHTML = '';
 
 //looping products array to get each object and its props in HTML content
