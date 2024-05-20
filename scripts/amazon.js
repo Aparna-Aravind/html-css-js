@@ -1,5 +1,7 @@
-import {cart} from './cart.js';
+import {cart, addToCart} from './cart.js';
 import {products} from '../data/products.js';
+import {convertCurrency} from '../utils/money.js';
+
 let productHTML = '';
 
 //looping products array to get each object and its props in HTML content
@@ -24,7 +26,7 @@ products.forEach((product) => {
         </div>
 
         <div class="product-price">
-        $${(product.priceCents / 100).toFixed(2)}
+        $${convertCurrency(product.priceCents)}
         </div>
 
         <div class="product-quantity-container">
@@ -58,54 +60,34 @@ products.forEach((product) => {
 })
 // displayed items in products array to HTML
 document.querySelector('.js-products-grid').innerHTML = productHTML;
-
-//AddtoCart Functionality
-// Fetching Add to cart Element Array 
 const addToCartElem = document.querySelectorAll('.js-add-to-cart');
 
 // Since its an array, Looping to add event listeners to each Button 
 addToCartElem.forEach((addToCartButton) => {
     addToCartButton.addEventListener('click', function () {
-        // Fetching unique ID from dataset given in data Attribute of Button
         const {productId} = addToCartButton.dataset;
         const quantitySelected = Number(document.querySelector(`.js-product-quantity-selector-${productId}`).value);
-        // console.log(productName);
-        let matchingFound;
-        // check whether item is already present in the cart array
-        cart.forEach((item) => {
-            if (productId === item.productId) {
-                matchingFound = item;
-            }
-        })
- 
-        if (matchingFound) {
-            matchingFound.quantity = matchingFound.quantity + quantitySelected;
-            console.log(cart);
-        } else {
-            // console.log('Pushing Item here');
-            cart.push({
-                productId: productId,
-                quantity: quantitySelected,
-            });
-            // console.log(cart);
-        }
-
-// Calculating Total items in cart 
-        let cartQuantity = 0;
-        cart.forEach((item) => {
-            console.log(cartQuantity,quantitySelected);
-            cartQuantity = cartQuantity + item.quantity;
-            console.log(cartQuantity, 'Items in cart');
-        })
-// setting total cart Items to the cart Interface
-        document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
-        document.querySelector(`.js-added-to-cart-${productId}`).classList.add('showElem');
-        setTimeout(()=>{
-            document.querySelector(`.js-added-to-cart-${productId}`).classList.remove('showElem');
-        },2000);
+        addToCart(productId,quantitySelected);
+        updateCartQuantity();
+        displayProductAdded(productId);
     })
 })
 
+function updateCartQuantity() {
+    let cartQuantity = 0;
+    console.log(`initially ${cartQuantity} items in the cart`);
+        cart.forEach((item) => {
+            cartQuantity = cartQuantity + item.quantity;
+            console.log(cartQuantity, 'Items in cart now!');
+        })
+// setting total cart Items to the cart Interface
+        document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
+}
 
-
+function displayProductAdded(productId) {
+    document.querySelector(`.js-added-to-cart-${productId}`).classList.add('showElem');
+        setTimeout(()=>{
+            document.querySelector(`.js-added-to-cart-${productId}`).classList.remove('showElem');
+        },2000);
+}
 
